@@ -4,9 +4,9 @@
 """
 
 from datetime import datetime
-from discord import DMChannel
 import os
 import traceback
+from constants import Constants
 
 import config
 
@@ -19,7 +19,7 @@ def err(error):
         raise error
     except Exception:
         error_message = traceback.format_exc()
-        log(f"[오류] {error_message}\n\n", True)
+        log(f"[오류] {error_message}", "err", True)
         return error_message
 
 
@@ -27,14 +27,14 @@ def warn(message: str):
     """
     경고 기록을 남길 때 사용해요!
     """
-    log(f"[경고] {message}")
+    log(f"[경고] {message}", "warn")
 
 
 def info(message: str):
     """
     일반적인 기록을 남길 때 사용해요!
     """
-    log(f"[정보] {message}")
+    log(f"[정보] {message}", "info")
 
 
 def debug(message: str):
@@ -42,41 +42,21 @@ def debug(message: str):
     디버그 모드를 켰을 때만 기록해 줘요!
     """
     if config.debug:
-        log(f"[디버그] {message}")
-
-
-def msg(message):
-    """
-    디스코드 메시지를 깔끔하게 정리해 기록해 줘요!
-    """
-    if message.content == "":
-        return
-
-    author = message.author
-
-    """message를 넣으면 로그를 씀"""
-    if isinstance(message.channel, DMChannel):
-        log_msg = f"DM <{author.name}> {message.content}"
-    else:
-        guild = message.guild
-        channel = message.channel
-        log_msg = f"<{channel.name} | {author.name}> {message.content} ({guild.name}, {author.id})"
-
-    log(log_msg)
+        log(f"[디버그] {message}", "debug")
 
 
 def query(message: str):
     """쿼리 로그 옵션이 켜져 있을 때만 기록해 줘요!"""
     if config.query_logging:
-        log("[쿼리] {}".format(message))
+        log(f"[쿼리] {message}", "query")
 
 
-def log(message: str, iserror=False):
+def log(message: str, level: str, iserror=False):
     now = datetime.now()
-    hour = now.strftime("%H")
-    minute = now.strftime("%M")
-    log_msg = f"{hour}시 {minute}분 / {message}"
-    print(log_msg)
+    time = now.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    log_msg = f"{time} / {message}"
+    log_msg_colored = f"\033[1;36m{time}\033[0m /{Constants.LOGGER_COLORS[level]} {message}\033[0m"
+    print(log_msg_colored)
     save(log_msg)
     if iserror:
         save_error(log_msg)

@@ -195,3 +195,27 @@ class Constants:
             "❗❗❗ Oh!!! Suddenly I'm hungry!!!",
         ],
     }
+
+    # 디스코드 커맨드 옵션 타입
+    OPTION_TYPES = {
+        1: "SUB_COMMAND",
+        2: "SUB_COMMAND_GROUP",
+        3: "STRING",
+        4: "INTEGER",
+        5: "BOOLEAN",
+        6: "USER",
+        7: "CHANNEL",
+        8: "ROLE",
+        9: "MENTIONABLE",
+        10: "NUMBER",
+        11: "ATTACHMENT"
+    }
+
+    # 로거 하이라이팅 컬러
+    LOGGER_COLORS = {
+        "debug": "\033[1;37m",  # WHITE
+        "query": "\033[1;32m",  # GREEN
+        "info": "\033[1;34m",   # BLUE
+        "warn": "\033[1;33m",   # YELLOW
+        "err": "\033[1;35m",    # MAGENTA
+    }
