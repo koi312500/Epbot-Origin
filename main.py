@@ -22,8 +22,6 @@ db = S_PgSQL()
 
 intents = discord.Intents.default()
 
-# intents.message_content = True
-
 fishdb = S_SQLite("static/fishing.db")
 
 
@@ -112,25 +110,6 @@ class ManagementCog(commands.Cog):
 
         logger.info("다시시작 완료!")
         await ctx.edit(content="`✔️ 전부 다시 불러와써!`")
-
-    """
-    @slash_command(name="info", description="Show Information about EpBot!")
-    async def info(self, ctx: discord.ApplicationContext):
-        embed = discord.Embed(
-            title="Information about EpBot(이프)",
-            description="This bot is a project designed based on Kimusoft's Thetabot V2 framework.",
-            colour=0x1DDB16,
-        )
-        embed.add_field(
-            name="'키뮤의 과학실' Official Support Sever Link",
-            value="🔗 https://discord.gg/XQuexpQ",
-            inline=True,
-        )
-        embed.set_footer(
-            text="Since this bot is originally a Korean bot, English support is still insufficient. 😭"
-        )
-        await ctx.respond(embed=embed)
-    """
 
     @commands.Cog.listener()
     async def on_application_command(self, ctx: ApplicationContext):

@@ -16,16 +16,10 @@ ADMINS = [
 """ PostgreSQL Database Configuration """
 PG_DSN = os.getenv("EP_PG_DSN")
 
-""" FishCard Server Setting"""
-CARD_SERVER = os.getenv("EP_CARD_SERVER", "")  # 슬래시로 끝내지 말아주세요
-CARD_TOKEN = os.getenv("EP_CARD_TOKEN", "")
-
 """ Discord Bot Configuration """
 TOKEN = os.getenv("EP_TOKEN")
 DEBUG_TOKEN = ""
 
-# 명령어 접두사 (띄어쓰기 주의)
-PREFIXES = ["이프야 ", "ㅇ", "잎", "ep "]
 # 하고 있는 게임 (프로필에 '... 하는 중'으로 보이는 것)
 ACTIVITIES = [
     "{}곳의 서버에서 검열 삭제",
@@ -55,9 +49,3 @@ def token():
 
 def activities():
     return ACTIVITIES
-
-
-@property
-def prefixes_no_space():
-    """접두사들을 띄어쓰기 없이 반환합니다."""
-    return [i.replace(" ", "") for i in PREFIXES]
