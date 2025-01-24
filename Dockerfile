@@ -14,7 +14,8 @@ RUN apk add postgresql-libs postgresql-client bash py3-setuptools git --no-cache
 COPY . .
 
 COPY docker/config.py config.py
+RUN chmod +x docker/run.sh
 
 ENV PYTHONUNBUFFERED=0
 
-CMD ["/bin/bash", "/app/docker/deploy/run.sh"]
+CMD ["/bin/bash", "/app/docker/run.sh"]
