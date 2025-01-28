@@ -7,18 +7,16 @@ import os
 from itertools import cycle
 
 import discord
-
 # 부가 임포트
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
 # 필수 임포트
 from discord.ext import commands, tasks
 
 import config
-from db.seta_pgsql import S_PgSQL
-from utils import logger
 from classes.room import working_now
 from classes.user import fishing_now
+from db.seta_pgsql import S_PgSQL
+from utils import logger
 
 db = S_PgSQL()
 
@@ -34,13 +32,15 @@ class CycleCog(commands.Cog):
         self.change_activity.start()  # pylint: disable=maybe-no-member
         self.cleaner.start()  # pylint: disable=maybe-no-member
 
-        # 앱스캐듈러
+    @commands.Cog.listener()
+    async def on_ready(self):
         logger.info("AsyncIOScheduler 스케쥴 시작")
         self.sched = AsyncIOScheduler()
 
         self.sched.add_job(self.day_end_schedule, "cron", hour="23", minute="55")
         # self.sched.add_job(self.day_end_schedule, 'cron', minute='*/5')
         self.sched.start()
+
 
     @tasks.loop(seconds=30)
     async def change_activity(self):

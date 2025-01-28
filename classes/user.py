@@ -136,6 +136,14 @@ class User:
             "users", f"theme='{await db.json_convert(self._theme)}'", f"id='{self.id}'"
         )
 
+    async def get_penalty(self, room: Room):
+        """레벨 제한에 따른 경험치/돈의 배율을 float로 반환합니다"""
+        level_limit = room.level_limit
+        if level_limit <= 0: return 1.0
+        penalty = (self.level / level_limit) ** 2
+        if penalty >= 1: return 1.0
+        return round(penalty + 0.00004, 4)
+
     # ------------------------------------- method(메서드) ------------------------------------- #
 
     async def purchase_land(self, room: Room, value):

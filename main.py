@@ -1,17 +1,17 @@
-from discord.ext import commands
-from discord.commands import slash_command, ApplicationContext
+import os
+import traceback
+from datetime import datetime
+
 import discord
+from discord.commands import slash_command, ApplicationContext
+from discord.ext import commands
 
 import config
+from classes.user import fishing_now
+from constants import Constants
 from db.seta_pgsql import S_PgSQL
 from db.seta_sqlite import S_SQLite
 from utils import logger
-import traceback
-import os
-from datetime import datetime
-from constants import Constants
-
-from classes.user import fishing_now
 
 logger.info("이프가 잠에서 깨어나는 중...")
 boot_start = datetime.today()
@@ -21,8 +21,6 @@ LOADING_DIR = ["cogs", "cogs/fishing"]
 db = S_PgSQL()
 
 intents = discord.Intents.default()
-
-# intents.message_content = True
 
 fishdb = S_SQLite("static/fishing.db")
 
@@ -95,42 +93,24 @@ class ManagementCog(commands.Cog):
 
     # cogs 폴더 안의 코드를 수정했다면 굳이 껐다 키지 않아도 다시시작 명령어로 적용이 가능해!
     @slash_command(name="다시시작", guild_ids=config.ADMIN_COMMAND_GUILD)
-    async def 다시시작(self, ctx: discord.ApplicationContext):
+    async def restart(self, ctx: discord.ApplicationContext):
         if ctx.author.id not in config.ADMINS:
             return await ctx.respond("흐음... 권한이 부족한 것 같은데?" "\n`❗ 권한이 부족합니다.`")
 
         w = await ctx.respond("`❗ Cogs를 다시 불러오고 이써...`")
         logger.info("이프 다시시작 중...")
+
         for _dir in LOADING_DIR:
             cog_list = [i.split(".")[0] for i in os.listdir(_dir) if ".py" in i]
             cog_list.remove("__init__")
             if "cycle" in cog_list:
-                cog_list.remove("cycle")  # 스케듈러가 제거가 안 되어서 제외
+                cog_list.remove("cycle")  # 스케줄러가 제거가 안 되어서 제외
             for i in cog_list:
                 self.bot.reload_extension(f"{_dir.replace('/', '.')}.{i}")
                 logger.info(f"'{i}' 다시 불러옴")
 
         logger.info("다시시작 완료!")
         await ctx.edit(content="`✔️ 전부 다시 불러와써!`")
-
-    """
-    @slash_command(name="info", description="Show Information about EpBot!")
-    async def info(self, ctx: discord.ApplicationContext):
-        embed = discord.Embed(
-            title="Information about EpBot(이프)",
-            description="This bot is a project designed based on Kimusoft's Thetabot V2 framework.",
-            colour=0x1DDB16,
-        )
-        embed.add_field(
-            name="'키뮤의 과학실' Official Support Sever Link",
-            value="🔗 https://discord.gg/XQuexpQ",
-            inline=True,
-        )
-        embed.set_footer(
-            text="Since this bot is originally a Korean bot, English support is still insufficient. 😭"
-        )
-        await ctx.respond(embed=embed)
-    """
 
     @commands.Cog.listener()
     async def on_application_command(self, ctx: ApplicationContext):

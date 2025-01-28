@@ -1,11 +1,11 @@
 import asyncio
-import json
-import sys
-
 import asyncpg
-
 import config
+import json
+
 from utils import logger
+
+
 class S_PgSQL:
     initialized = False
 
