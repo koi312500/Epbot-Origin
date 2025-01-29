@@ -10,6 +10,7 @@ import discord
 
 # 부가 임포트
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from discord import slash_command
 
 # 필수 임포트
 from discord.ext import commands, tasks
@@ -19,6 +20,7 @@ from classes.room import working_now
 from classes.user import fishing_now
 from db.seta_pgsql import S_PgSQL
 from utils import logger
+from utils import on_working
 
 db = S_PgSQL()
 
@@ -62,13 +64,19 @@ class CycleCog(commands.Cog):
         await db.update_sql("rooms", "season = season + 1")  # 계절 변화
         await db.update_sql("rooms", "season = 1", "season > 4")  # 계절 변화
 
+    @on_working.administrator()
+    @slash_command(
+        name="강제결산",
+        guild_ids=config.ADMIN_COMMAND_GUILD,
+        description="관리자 디버그용 도구입니다. (관리자 전용)",
+    )
+    async def force_schedule(self, ctx: discord.ApplicationContext):
+        await ctx.defer()
+        await self.day_end_schedule()
+        await ctx.respond("강제결산 완료!")
+
 
 """ 사용하지 않음
-    @commands.command()
-    @administrator()
-    async def 강제결산(self, ctx):
-        await self.day_end_schedule()
-        await ctx.send("강제결산 완료!")
 
     @commands.command()
     @administrator()
