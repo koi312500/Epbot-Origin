@@ -7,8 +7,10 @@ import os
 from itertools import cycle
 
 import discord
+
 # 부가 임포트
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 # 필수 임포트
 from discord.ext import commands, tasks
 
@@ -41,7 +43,6 @@ class CycleCog(commands.Cog):
         # self.sched.add_job(self.day_end_schedule, 'cron', minute='*/5')
         self.sched.start()
 
-
     @tasks.loop(seconds=30)
     async def change_activity(self):
         gaming = next(activity).format(len(self.bot.guilds))
@@ -59,7 +60,7 @@ class CycleCog(commands.Cog):
     async def day_end_schedule(self):
         logger.info("자정 스케쥴 실행")
         await db.update_sql("rooms", "season = season + 1")  # 계절 변화
-        await db.update_sql("rooms", "season = 1", "season = 5")  # 계절 변화
+        await db.update_sql("rooms", "season = 1", "season > 4")  # 계절 변화
 
 
 """ 사용하지 않음
@@ -175,4 +176,6 @@ class CycleCog(commands.Cog):
 
 def setup(bot):
     logger.info(f"{os.path.abspath(__file__)} 로드 완료")
-    bot.add_cog(CycleCog(bot))  # 꼭 이렇게 위의 클래스를 이렇게 add_cog해 줘야 작동해요!
+    bot.add_cog(
+        CycleCog(bot)
+    )  # 꼭 이렇게 위의 클래스를 이렇게 add_cog해 줘야 작동해요!
