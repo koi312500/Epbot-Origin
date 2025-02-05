@@ -7,8 +7,11 @@ import os
 from itertools import cycle
 
 import discord
+
 # 부가 임포트
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from discord import slash_command
+
 # 필수 임포트
 from discord.ext import commands, tasks
 
@@ -17,6 +20,7 @@ from classes.room import working_now
 from classes.user import fishing_now
 from db.seta_pgsql import S_PgSQL
 from utils import logger
+from utils import on_working
 
 db = S_PgSQL()
 
@@ -41,7 +45,6 @@ class CycleCog(commands.Cog):
         # self.sched.add_job(self.day_end_schedule, 'cron', minute='*/5')
         self.sched.start()
 
-
     @tasks.loop(seconds=30)
     async def change_activity(self):
         gaming = next(activity).format(len(self.bot.guilds))
@@ -59,15 +62,21 @@ class CycleCog(commands.Cog):
     async def day_end_schedule(self):
         logger.info("자정 스케쥴 실행")
         await db.update_sql("rooms", "season = season + 1")  # 계절 변화
-        await db.update_sql("rooms", "season = 1", "season = 5")  # 계절 변화
+        await db.update_sql("rooms", "season = 1", "season > 4")  # 계절 변화
+
+    @on_working.administrator()
+    @slash_command(
+        name="강제결산",
+        guild_ids=config.ADMIN_COMMAND_GUILD,
+        description="관리자 디버그용 도구입니다. (관리자 전용)",
+    )
+    async def force_schedule(self, ctx: discord.ApplicationContext):
+        await ctx.defer()
+        await self.day_end_schedule()
+        await ctx.respond("강제결산 완료!")
 
 
 """ 사용하지 않음
-    @commands.command()
-    @administrator()
-    async def 강제결산(self, ctx):
-        await self.day_end_schedule()
-        await ctx.send("강제결산 완료!")
 
     @commands.command()
     @administrator()
@@ -175,4 +184,6 @@ class CycleCog(commands.Cog):
 
 def setup(bot):
     logger.info(f"{os.path.abspath(__file__)} 로드 완료")
-    bot.add_cog(CycleCog(bot))  # 꼭 이렇게 위의 클래스를 이렇게 add_cog해 줘야 작동해요!
+    bot.add_cog(
+        CycleCog(bot)
+    )  # 꼭 이렇게 위의 클래스를 이렇게 add_cog해 줘야 작동해요!
